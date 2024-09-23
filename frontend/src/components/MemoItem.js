@@ -18,8 +18,8 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
         { content: editedContent },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      onUpdate(memo.id); // メモのIDを親コンポーネントに渡す
-      await fetchMemos(); // メモリストを再取得
+      onUpdate(memo.id);
+      await fetchMemos();
       setIsEditing(false);
     } catch (error) {
       console.error('Update Error:', error.response ? error.response.data : error.message);
@@ -32,9 +32,9 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
       const response = await axios.delete(`http://localhost:5000/memos/${memo.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response.data); // 成功時のメッセージを確認
-      onDelete(memo.id); // メモのIDを親コンポーネントに渡す
-      await fetchMemos(); // メモリストを再取得
+      console.log(response.data);
+      onDelete(memo.id);
+      await fetchMemos();
     } catch (error) {
       console.error('Delete Error:', error.response ? error.response.data : error.message);
     }

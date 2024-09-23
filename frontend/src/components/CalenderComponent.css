@@ -1,0 +1,51 @@
+.calendar-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.calendar-header {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    /* 1 column for time, 7 for days */
+    background-color: #f0f0f0;
+}
+
+.calendar-day {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.calendar-body {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+}
+
+.calendar-row {
+    display: contents;
+}
+
+.calendar-hour {
+    padding: 10px;
+    text-align: center;
+    border-right: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.calendar-slot {
+    border: 1px solid #ddd;
+    height: 50px;
+    /* Adjust height based on your preference */
+}
+
+.calendar-event {
+    position: absolute;
+    /*width: 100%;*/
+    border-radius: 4px;
+    padding: 2px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    background-color: #3498db;
+}
+  

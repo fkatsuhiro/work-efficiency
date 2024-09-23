@@ -1,6 +1,7 @@
+// メモ管理のためのツール
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import MemoItem from './MemoItem'; // MemoItemのインポート
+import MemoItem from './MemoItem';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -77,14 +78,8 @@ function MemoList() {
   };
 
   const handleEdit = (memo) => {
-    /*setNewMemo(memo.content); // 編集するメモの内容をテキストボックスにセット*/
-    setEditMemoId(memo.id);   // 編集するメモのIDをセット
-    setShowModal(true);       // モーダルを表示
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('token'); // トークンを削除
-    navigate('/login'); // ログインページにリダイレクト
+    setEditMemoId(memo.id);
+    setShowModal(true);
   };
 
   const handleDeleteMemo = async (memoId) => {
@@ -108,7 +103,6 @@ function MemoList() {
       <div className='memo-area'>
         <div className='d-flex justify-content-end' style={{ paddingRight: '15px' }}>
           <button className='btn btn-primary' style={{ marginRight: '10px' }} onClick={() => { setNewMemo(''); setEditMemoId(null); setShowModal(true); }}>メモを追加</button>
-          <button className='btn btn-primary' onClick={handleLogout}>ログアウト</button>
         </div>
       </div>
       <div className='outer-memo-area mt-3'>

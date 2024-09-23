@@ -47,10 +47,23 @@ db.serialize(() => {
     `);
 
     db.run(`
-    CREATE TABLE IF NOT EXISTS document (
+    CREATE TABLE IF NOT EXISTS documents (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
+        name TEXT,
         content TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+    `);
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT,
+        date TEXT,
+        start_time DATETIME,
+        end_time DATETIME,
         FOREIGN KEY (user_id) REFERENCES users(id)
     )
     `);
@@ -94,6 +107,8 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
+
+/* メモ画面 */
 
 // メモ一覧取得
 app.get('/memos', authenticateToken, (req, res) => {
@@ -149,6 +164,8 @@ app.delete('/memos/:id', authenticateToken, (req, res) => {
     });
 });
 
+/* タスク管理画面 */
+
 // タスク一覧取得
 app.get('/tasks', authenticateToken, (req, res) => {
     db.all('SELECT * FROM tasks WHERE user_id = ?', [req.user.id], (err, rows) => {
@@ -188,7 +205,7 @@ app.put('/tasks/:id', authenticateToken, (req, res) => {
 app.delete('/tasks/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
 
-    console.log(`Deleting task with ID: ${id} for user: ${req.user.id}`); // ログ出力
+    console.log(`Deleting task with ID: ${id} for user: ${req.user.id}`);
 
     db.run('DELETE FROM tasks WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
         if (err) {
@@ -200,6 +217,118 @@ app.delete('/tasks/:id', authenticateToken, (req, res) => {
         res.send('Task deleted');
     });
 });
+
+/* ドキュメント作成画面 */
+
+// ドキュメント追加
+app.post('/documents', authenticateToken, (req, res) => {
+    const { content, name } = req.body;
+
+    // ドキュメントの挿入クエリ
+    db.run('INSERT INTO documents (user_id, content, name) VALUES (?, ?, ?)', [req.user.id, content, name], function (err) {
+        if (err) {
+            console.error(err); // エラーログを出力
+            return res.status(500).send('ドキュメントの保存に失敗しました');
+        }
+        // 挿入成功時、挿入されたIDを返す
+        res.send({ id: this.lastID });
+    });
+});
+
+// ドキュメント一覧取得
+app.get('/documents', authenticateToken, (req, res) => {
+    db.all('SELECT * FROM documents WHERE user_id = ?', [req.user.id], (err, rows) => {
+        if (err) {
+            return res.status(500).send('Error fetching documents');
+        }
+        res.json(rows);
+    });
+});
+
+app.get('/documents/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    db.get('SELECT * FROM documents WHERE id = ? AND user_id = ?', [id, userId], (err, row) => {
+        if (err) {
+            return res.status(500).send('Error fetching document');
+        }
+        if (!row) {
+            return res.status(404).send('Document not found');
+        }
+        res.json(row);
+    });
+});
+
+// ドキュメント削除
+app.delete('/documents/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+
+    console.log(`Deleting document with ID: ${id} for user: ${req.user.id}`);
+
+    db.run('DELETE FROM documents WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
+        if (err) {
+            return res.status(500).send('Error deleting document');
+        }
+        if (this.changes === 0) {
+            return res.status(404).send('Documents not found or not authorized');
+        }
+        res.send('Documents deleted');
+    });
+});
+
+/* スケジュール管理画面 */
+
+// 一覧取得
+app.get('/events', authenticateToken, (req, res) => {
+    const userId = req.user.id;
+    db.all('SELECT * FROM events WHERE user_id = ?', [userId], (err, rows) => {
+        if (err) return res.status(500).send('イベントの取得に失敗しました');
+        res.json(rows);
+    });
+});
+
+// 予定の追加
+app.post('/events', authenticateToken, (req, res) => {
+    const { title, start_time, end_time } = req.body;
+
+    // バリデーション
+    if (!title || !start_time || !end_time) {
+        return res.status(400).send('タイトル、開始時刻、終了時刻は必須です');
+    }
+
+    db.run('INSERT INTO events ( user_id, title, start_time, end_time ) VALUES (?, ?, ?, ?)',
+        [req.user.id, title, start_time, end_time], function (err) {
+            if (err) {
+                console.log('SQLエラー: ', err);
+                return res.status(500).send('イベントの作成に失敗しました');
+            }
+            res.send({ id: this.lastID });
+        });
+});
+
+
+// 予定の更新
+app.put('/events/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    const { title, start_time, end_time } = req.body;
+    db.run('UPDATE events SET title = ?, start_time = ?, end_time = ? WHERE id = ? AND user_id = ?',
+        [title, start_time, end_time, id, req.user.id], function (err) {
+            if (err) return res.status(500).send('イベントの更新に失敗しました');
+            res.send('イベントが更新されました');
+        });
+});
+
+
+// 予定の削除
+app.delete('/events/:id', authenticateToken, (req, res) => {
+    const { id } = req.params;
+    db.run('DELETE FROM events WHERE id = ? AND user_id = ?', [id, req.user.id], function (err) {
+        if (err) return res.status(500).send('イベントの削除に失敗しました');
+        res.send('イベントが削除されました');
+    });
+});
+
 
 // Express サーバー起動
 app.listen(5000, () => {

@@ -19,6 +19,7 @@ function TaskList() {
       const res = await axios.get('http://localhost:5000/tasks', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
+      /* タスク締め切りの期限でソートするための処理 */
       const sortedTasks = res.data.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
       setTasks(sortedTasks);
     } catch (error) {
@@ -26,6 +27,7 @@ function TaskList() {
     }
   };
 
+  // タスクを追加する
   const handleAddTask = async () => {
     try {
       await axios.post('http://localhost:5000/tasks', {
@@ -35,11 +37,9 @@ function TaskList() {
       }, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
-      // 
       setNewTaskContent('');
       setNewTaskStatus(0);
       setNewTaskDeadline('');
-      // タスク一覧を取得
       fetchTasks();
     } catch (error) {
       console.error('Failed to add task', error);

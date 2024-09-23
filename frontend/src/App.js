@@ -6,6 +6,7 @@ import MemoList from './components/MemoList';
 import Top from './components/Top';
 import DocumentList from './components/DocumentList';
 import TaskList from './components/TaskList';
+import CalenderPage from './components/CalenderPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import icon from './images/icon.jpg';
 
@@ -52,6 +53,9 @@ function App() {
                     <Link className="nav-link" to="/memos">Memos</Link>
                   </li>
                   <li className="nav-item">
+                    <Link className="nav-link" to="/events">Calender</Link>
+                  </li>
+                  <li className="nav-item">
                     <button className="nav-link btn" onClick={handleLogout}>Logout</button>
                   </li>
                 </ul>
@@ -69,6 +73,7 @@ function App() {
         <Route path="/top" element={isLoggedIn ? <Top /> : <Navigate to="/login" />} />
         <Route path="/documents" element={isLoggedIn ? <DocumentList /> : <Navigate to="/login" />} />
         <Route path="/tasks" element={isLoggedIn ? <TaskList /> : <Navigate to="/login" />} />
+        <Route path="/events" element={isLoggedIn ? <CalenderPage /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

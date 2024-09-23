@@ -8,7 +8,7 @@ import { Modal, Button } from 'react-bootstrap';
 // ArcElementを登録
 Chart.register(ArcElement);
 
-// カスタムプラグインで中央にテキストを描画
+// チャートの中央にテキストを追加
 const centerTextPlugin = {
   id: 'centerText',
   afterDraw: function (chart) {
@@ -69,7 +69,7 @@ function TaskItem({ task, onDelete, onUpdate, fetchTasks }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       onDelete(task.id);
-      await fetchTasks(); // メモリストを再取得
+      await fetchTasks();
     } catch (error) {
       console.error('Failed to delete task', error);
     }
