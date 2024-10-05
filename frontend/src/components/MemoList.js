@@ -1,10 +1,9 @@
-// メモ管理のためのツール
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import MemoItem from './MemoItem';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { Modal, Button } from 'react-bootstrap'; // Bootstrapのモーダルをインポート
 
 function MemoList() {
   const [memos, setMemos] = useState([]);
@@ -12,8 +11,8 @@ function MemoList() {
   const [editMemoId, setEditMemoId] = useState(null); // 編集中のメモのIDを管理
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false); // モーダルの表示/非表示を管理
+  const [validationError, setValidationError] = useState(''); // 空文字チェック用のエラーメッセージ
   const navigate = useNavigate();
-  const [currentTime, setCurrentTime] = useState(null); // currentTimeを状態として管理
 
   const fetchMemos = async () => {
     try {
@@ -41,6 +40,12 @@ function MemoList() {
 
   // メモを追加する関数
   const addMemo = async () => {
+    // 空文字の場合はエラーメッセージをセット
+    if (!newMemo.trim()) {
+      setValidationError('メモの内容を入力してください。'); 
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const time = new Date().toISOString(); // 現在の時刻を取得
@@ -50,7 +55,8 @@ function MemoList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewMemo('');
-      setShowModal(false); // メモを追加したらモーダルを閉じる
+      setValidationError('');
+      setShowModal(false);
       await fetchMemos();
     } catch (error) {
       console.error(error);
@@ -60,6 +66,11 @@ function MemoList() {
 
   // メモを編集する関数
   const editMemo = async () => {
+    if (!newMemo.trim()) {
+      setValidationError('メモの内容を入力してください。'); // 空文字の場合はエラーメッセージをセット
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       await axios.put(
@@ -68,6 +79,7 @@ function MemoList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewMemo('');
+      setValidationError('');
       setEditMemoId(null);
       setShowModal(false);
       await fetchMemos();
@@ -79,6 +91,8 @@ function MemoList() {
 
   const handleEdit = (memo) => {
     setEditMemoId(memo.id);
+    setNewMemo(memo.content); 
+    setValidationError(''); 
     setShowModal(true);
   };
 
@@ -89,22 +103,27 @@ function MemoList() {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Memo deleted successfully');
-      //alert('Memo deleted successfully'); // 成功時に通知
-      await fetchMemos(); // メモリストを再取得
+      await fetchMemos();
     } catch (error) {
       console.error('Delete Error:', error.response ? error.response.data : error.message);
     }
   };
 
+  // モーダルを閉じる際にエラーメッセージをリセット
+  const handleCloseModal = () => {
+    setValidationError('');
+    setShowModal(false);
+  };
 
   return (
     <div>
       <h3 className='memo-title'>メモ一覧</h3>
       <div className='memo-area'>
         <div className='d-flex justify-content-end' style={{ paddingRight: '15px' }}>
-          <button className='btn btn-primary' style={{ marginRight: '10px' }} onClick={() => { setNewMemo(''); setEditMemoId(null); setShowModal(true); }}>メモを追加</button>
+          <Button onClick={() => { setNewMemo(''); setEditMemoId(null); setShowModal(true); }}>メモを追加</Button>
         </div>
       </div>
+
       <div className='outer-memo-area mt-3'>
         <div className='memo-area row'>
           {error && <p style={{ color: 'red' }}>{error}</p>}
@@ -115,54 +134,32 @@ function MemoList() {
             </div>
           ))}
         </div>
-        <div className='mt-5'></div>
       </div>
 
-      {/* モーダル表示部分 */}
-      {showModal && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3 className='mt-3'>{editMemoId ? 'メモを編集' : 'メモを追加'}</h3>
-            <input
-              type="text"
-              value={newMemo}
-              onChange={(e) => setNewMemo(e.target.value)}
-              placeholder="メモを入力してください"
-              className='mt-3 form-control'
-            />
-            <div className='d-flex mt-3 justify-content-end'>
-              {editMemoId ? (
-                <button onClick={editMemo} className='btn btn-primary'>保存</button> // 編集モードの場合
-              ) : (
-                <button onClick={addMemo} className='btn btn-primary'>追加</button> // 追加モードの場合
-              )}
-              <button onClick={() => setShowModal(false)} className='btn btn-secondary'>戻る</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* モーダル用の簡易CSS */}
-      <style>{`
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .modal-content {
-          background: white;
-          padding: 20px;
-          border-radius: 5px;
-          max-width: 500px;
-          width: 100%;
-        }
-      `}</style>
+      {/* Bootstrapのモーダルを使用 */}
+      <Modal show={showModal} onHide={handleCloseModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>{editMemoId ? 'メモを編集' : 'メモを追加'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <input
+            type="text"
+            value={newMemo}
+            onChange={(e) => setNewMemo(e.target.value)}
+            placeholder="メモを入力してください"
+            className="form-control mt-3"
+          />
+          {validationError && <p style={{ color: 'red', marginTop: '10px' }}>{validationError}</p>} {/* エラーメッセージを表示 */}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>戻る</Button>
+          {editMemoId ? (
+            <Button variant="primary" onClick={editMemo}>保存</Button> // 編集モードの場合
+          ) : (
+            <Button variant="primary" onClick={addMemo}>追加</Button> // 追加モードの場合
+          )}
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }

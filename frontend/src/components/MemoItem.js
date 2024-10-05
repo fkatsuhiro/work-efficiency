@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Modal, Button } from 'react-bootstrap';
 
 function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(memo.content);
+  // バリデーションチェック用
+  const [emptyContentError, setEmptyContentError] = useState('');
 
   const handleUpdate = async () => {
+
+    if (!editedContent.trim()) {
+      setEmptyContentError('編集するメモの内容を入力してください。');
+      return;
+    }
+
     try {
-      if (!editedContent) {
-        console.error('Content is required');
-        return;
-      }
       const token = localStorage.getItem('token');
       await axios.put(
         `http://localhost:5000/memos/${memo.id}`,
@@ -40,7 +45,11 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
     }
   };
 
-
+  // モーダルを閉じる際に編集内容をリセット
+  const handleClose = () => {
+    setEditedContent(memo.content); // 元の内容にリセット
+    setIsEditing(false); // モーダルを閉じる
+  };
 
   return (
     <div className="container mt-3">
@@ -53,44 +62,32 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
         </div>
       </div>
 
-      {isEditing && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>メモを編集</h3>
-            <input
-              type="text"
-              value={editedContent}
-              onChange={(e) => setEditedContent(e.target.value)}
-              placeholder="Edit memo content"
-              className="form-control mt-3"
-            />
-            <div className="d-flex mt-3 justify-content-end">
-              <button onClick={handleUpdate} className="btn btn-primary">保存</button>
-              <button onClick={() => setIsEditing(false)} className="btn btn-secondary">戻る</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Bootstrapモーダルで編集機能を実装 */}
+      <Modal show={isEditing} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>メモを編集</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <input
+            type="text"
+            value={editedContent}
+            onChange={(e) => setEditedContent(e.target.value)}
+            placeholder="Edit memo content"
+            className="form-control"
+          />
+          {emptyContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{emptyContentError}</p>} {/* エラーメッセージを表示 */}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            キャンセル
+          </Button>
+          <Button variant="primary" onClick={handleUpdate}>
+            保存
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <style>{`
-        .modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .modal-content {
-          background: white;
-          padding: 20px;
-          border-radius: 5px;
-          max-width: 500px;
-          width: 100%;
-        }
         .sticky-note {
           position: relative;
           min-height: 150px;

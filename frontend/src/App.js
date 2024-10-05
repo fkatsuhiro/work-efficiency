@@ -9,6 +9,7 @@ import TaskList from './components/TaskList';
 import CalenderPage from './components/CalenderPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import icon from './images/icon.jpg';
+import ToDoDisplay from './components/ToDoDisplay';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -47,14 +48,17 @@ function App() {
                     <Link className="nav-link" to="/documents">Documents</Link>
                   </li>
                   <li className="nav-item">
+                    <Link className="nav-link" to="/todos">ToDos</Link>
+                  </li>
+                  <li className="nav-item">
                     <Link className="nav-link" to="/tasks">Tasks</Link>
                   </li>
                   <li className="nav-item">
                     <Link className="nav-link" to="/memos">Memos</Link>
                   </li>
-                  <li className="nav-item">
+                  {/*<li className="nav-item">
                     <Link className="nav-link" to="/events">Calender</Link>
-                  </li>
+                  </li>*/}
                   <li className="nav-item">
                     <button className="nav-link btn" onClick={handleLogout}>Logout</button>
                   </li>
@@ -74,6 +78,7 @@ function App() {
         <Route path="/documents" element={isLoggedIn ? <DocumentList /> : <Navigate to="/login" />} />
         <Route path="/tasks" element={isLoggedIn ? <TaskList /> : <Navigate to="/login" />} />
         <Route path="/events" element={isLoggedIn ? <CalenderPage /> : <Navigate to="/login" />} />
+        <Route path="/todos" element={isLoggedIn ? <ToDoDisplay /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

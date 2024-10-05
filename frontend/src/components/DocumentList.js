@@ -12,6 +12,8 @@ function DocumentList() {
   const [documents, setDocuments] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [documentName, setDocumentName] = useState('');
+  // ドキュメント名が空の場合
+  const [emptyDocumentNameError, setEmptyDocumentNameError] = useState('');
 
   useEffect(() => {
     fetchDocuments();
@@ -30,25 +32,38 @@ function DocumentList() {
 
   /* プレビュー処理 */
   const handlePreview = () => {
-    const previewElement = document.getElementById('preview');
-    previewElement.innerHTML = marked(markdown);
-    previewElement.classList.add('preview-style');
+    if (!markdown.trim()) {
+      alert('文章を入力してください。');
+    } else {
+      const previewElement = document.getElementById('preview');
+      previewElement.innerHTML = marked(markdown);
+      previewElement.classList.add('preview-style');
+    }
   };
 
   /* PDF出力処理 */
   const handlePDFExport = () => {
-    const pdf = new jsPDF();
-    const previewElement = document.getElementById('preview');
+    if (!markdown.trim()) {
+      alert('文書を入力してください。');
+    } else {
+      const pdf = new jsPDF();
+      const previewElement = document.getElementById('preview');
 
-    html2canvas(previewElement).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0);
-      pdf.save('document.pdf');
-    });
+      html2canvas(previewElement).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0);
+        pdf.save('document.pdf');
+      });
+    }
   };
 
   // ドキュメントを追加する
   const handleAddDocument = async () => {
+    if (!documentName.trim()) {
+      setEmptyDocumentNameError('ドキュメント名を入力してください。');
+      return;
+    }
+
     try {
       await axios.post('http://localhost:5000/documents', {
         content: markdown,
@@ -80,7 +95,11 @@ function DocumentList() {
 
 
   const openModal = () => {
-    setShowModal(true);
+    if (!markdown.trim()) {
+      alert('文書を入力してください。');
+    } else {
+      setShowModal(true);
+    }
   };
 
   return (
@@ -130,6 +149,7 @@ function DocumentList() {
               placeholder="ドキュメント名"
               className='form-control'
             />
+            {emptyDocumentNameError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{emptyDocumentNameError}</p>} {/* エラーメッセージを表示 */}
           </Modal.Body>
           <Modal.Footer>
             <Button variant="secondary" onClick={() => setShowModal(false)}>キャンセル</Button>
