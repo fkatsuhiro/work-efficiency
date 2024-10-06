@@ -22,14 +22,16 @@ function ToDoDisplay() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTodos(res.data);
-            calculateCompletionRate(res.data); // ToDo取得後に達成率を計算
+            // ToDo取得後に達成率を計算
+            calculateCompletionRate(res.data);
         } catch (error) {
             console.error('ToDoの取得に失敗しました', error);
         }
     };
 
     useEffect(() => {
-        fetchTodos(); // 初回レンダリング時にToDo一覧を取得
+        // 初回レンダリング時にToDo一覧を取得
+        fetchTodos();
     }, []);
 
     // 新しいToDoを追加する関数

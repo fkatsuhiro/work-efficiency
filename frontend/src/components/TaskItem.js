@@ -38,59 +38,46 @@ function TaskItem({ task, minDeadline, onDelete, onUpdate, fetchTasks }) {
   const [editedDeadline, setEditedDeadline] = useState(task.deadline);
   const [showModal, setShowModal] = useState(false); // モーダル表示状態を管理
   // バリデーションチェック用
-  const [emptyContentError, setEmptyContentError] = useState('');
-  const [choiceStatusError, setChoiceStatusError] = useState('');
-  const [emptyDeadlineError, setEmptyDeadlineError] = useState('');
+  const [ emptyContentError, setEmptyContentError ] = useState('');
+  const [ muchContentError, setMuchContentError ] = useState('');
+  const [ choiceStatusError, setChoiceStatusError ] = useState('');
+  const [ emptyDeadlineError, setEmptyDeadlineError ] = useState('');
 
   // タスクを更新する関数
   const handleUpdate = async () => {
+    setEmptyContentError('');
+    setMuchContentError('');
+    setChoiceStatusError('');
+    setEmptyDeadlineError('');
 
     // タスクの内容が空文字のバリデーション
     if (!editedContent.trim()) {
       // 完成率が0~100以外の数字が選択されている場合のバリデーション
-      if (editedStatus < 0 || editedStatus > 100 || !editedStatus === "" || isNaN(editedStatus)) {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!editedDeadline.trim()) {
-          setEmptyContentError('タスクの内容を入力してください。');
-          setChoiceStatusError('0~100でタスクの完成率を入力してください。');
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
-        }
-        else {
+      if (editedStatus < 0 || editedStatus > 100 || isNaN(editedStatus)) {
           setEmptyContentError('タスクの内容を入力してください。');
           setChoiceStatusError('0~100でタスクの完成率を入力してください。');
           return;
-        }
       } else {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!editedDeadline.trim()) {
-          setEmptyContentError('タスクの内容を入力してください。');
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
-        }
-        else {
           setEmptyContentError('タスクの内容を入力してください。');
           return;
-        }
       }
     } else {
-      // 完成率が0~100以外の数字が選択されている場合のバリデーション
-      if (editedStatus < 0 || editedStatus > 100 || !editedStatus === "" || isNaN(editedStatus)) {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!editedDeadline.trim()) {
-          setChoiceStatusError('0~100でタスクの完成率を入力してください。');
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
-        }
-        else {
-          setChoiceStatusError('0~100でタスクの完成率を入力してください。');
-          return;
+      // 字数制限超えのバリデーション
+      if (editedContent.length > 40) {
+        // 完成率が0~100以外の数字が選択されている場合のバリデーション
+        if (editedStatus < 0 || editedStatus > 100 || isNaN(editedStatus) ) {
+            setMuchContentError('40文字以内で入力してください。');
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            return;
+        } else {
+            setMuchContentError('40文字以内で入力してください。');
+            return;
         }
       } else {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!editedDeadline.trim()) {
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
+        // 完成率が0~100以外の数字が選択されている場合のバリデーション
+        if (editedStatus < 0 || editedStatus > 100 || isNaN(editedStatus)) {
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            return;
         }
       }
     }
@@ -194,6 +181,7 @@ function TaskItem({ task, minDeadline, onDelete, onUpdate, fetchTasks }) {
             className='form-control'
           />
           {emptyContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{emptyContentError}</p>} {/* エラーメッセージを表示 */}
+          {muchContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{muchContentError}</p>} {/* エラーメッセージを表示 */}
           <input
             type="number"
             value={editedStatus}

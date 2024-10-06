@@ -11,6 +11,7 @@ function TaskList() {
   const [emptyContentError, setEmptyContentError] = useState('');
   const [choiceStatusError, setChoiceStatusError] = useState('');
   const [emptyDeadlineError, setEmptyDeadlineError] = useState('');
+  const [muchContentError, setMuchContentError] = useState('');
   const [minDeadline, setMinDeadline] = useState('');
 
   useEffect(() => {
@@ -42,6 +43,7 @@ function TaskList() {
     setEmptyContentError('');
     setChoiceStatusError('');
     setEmptyDeadlineError('');
+    setMuchContentError('');
 
     // タスクの内容が空文字のバリデーション
     if (!newTaskContent.trim()) {
@@ -72,23 +74,52 @@ function TaskList() {
         }
       }
     } else {
-      // 完成率が0~100以外の数字が選択されている場合のバリデーション
-      if (newTaskStatus < 0 || newTaskStatus > 100 || !newTaskStatus.trim()) {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!newTaskDeadline.trim()) {
-          setChoiceStatusError('0~100でタスクの完成率を入力してください。');
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
-        }
-        else {
-          setChoiceStatusError('0~100でタスクの完成率を入力してください。');
-          return;
+      // 字数制限超えのバリデーション
+      if (newTaskContent.length > 40) {
+        // 完成率が0~100以外の数字が選択されている場合のバリデーション
+        if (newTaskStatus < 0 || newTaskStatus > 100 || !newTaskStatus.trim()) {
+          // 締め切り期限が選択されていない場合のバリデーション
+          if (!newTaskDeadline.trim()) {
+            setMuchContentError('40文字以内で入力してください。');
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
+            return;
+          }
+          else {
+            setMuchContentError('40文字以内で入力してください。');
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            return;
+          }
+        } else {
+          // 締め切り期限が選択されていない場合のバリデーション
+          if (!newTaskDeadline.trim()) {
+            setMuchContentError('40文字以内で入力してください。');
+            setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
+            return;
+          } else {
+            setMuchContentError('40文字以内で入力してください。');
+            return;
+          }
         }
       } else {
-        // 締め切り期限が選択されていない場合のバリデーション
-        if (!newTaskDeadline.trim()) {
-          setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
-          return;
+        // 完成率が0~100以外の数字が選択されている場合のバリデーション
+        if (newTaskStatus < 0 || newTaskStatus > 100 || !newTaskStatus.trim()) {
+          // 締め切り期限が選択されていない場合のバリデーション
+          if (!newTaskDeadline.trim()) {
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
+            return;
+          }
+          else {
+            setChoiceStatusError('0~100でタスクの完成率を入力してください。');
+            return;
+          }
+        } else {
+          // 締め切り期限が選択されていない場合のバリデーション
+          if (!newTaskDeadline.trim()) {
+            setEmptyDeadlineError('タスクの締め切り時刻を入力してください。');
+            return;
+          }
         }
       }
     }
@@ -144,6 +175,7 @@ function TaskList() {
             className='form-control mt-4'
           />
           {emptyContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{emptyContentError}</p>} {/* エラーメッセージを表示 */}
+          {muchContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{muchContentError}</p>} {/* エラーメッセージを表示 */}
           <input
             type="number"
             value={newTaskStatus}

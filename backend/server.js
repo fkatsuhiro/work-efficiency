@@ -189,8 +189,7 @@ app.get('/tasks', authenticateToken, (req, res) => {
 // タスク追加
 app.post('/tasks', authenticateToken, (req, res) => {
     const { content, status, deadline } = req.body;
-    const repaireDeadline = deadline.replace('T', '日 ').replace('-', '年').replace('-', '月');
-    db.run('INSERT INTO tasks (user_id, content, status, deadline) VALUES (?, ?, ?, ?)', [req.user.id, content, status || 0, repaireDeadline], function (err) {
+    db.run('INSERT INTO tasks (user_id, content, status, deadline) VALUES (?, ?, ?, ?)', [req.user.id, content, status || 0, deadline], function (err) {
         if (err) return res.status(500).send('Error adding task');
         res.status(201).send('Task added');
     });

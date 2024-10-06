@@ -8,10 +8,15 @@ import { Modal, Button } from 'react-bootstrap'; // Bootstrapのモーダルを�
 function MemoList() {
   const [memos, setMemos] = useState([]);
   const [newMemo, setNewMemo] = useState('');
-  const [editMemoId, setEditMemoId] = useState(null); // 編集中のメモのIDを管理
+  // 編集中のメモのIDを管理
+  const [editMemoId, setEditMemoId] = useState(null);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false); // モーダルの表示/非表示を管理
-  const [validationError, setValidationError] = useState(''); // 空文字チェック用のエラーメッセージ
+  // モーダルの表示/非表示を管理
+  const [showModal, setShowModal] = useState(false);
+  // 空文字チェック用のエラーメッセージ
+  const [emptyContentError, setEmptyContentError] = useState('');
+  // 文字数チェックのバリデーション(65文字まで)
+  const [ muchContentError, setMuchContentError] = useState('');
   const navigate = useNavigate();
 
   const fetchMemos = async () => {
@@ -40,9 +45,19 @@ function MemoList() {
 
   // メモを追加する関数
   const addMemo = async () => {
+    // アラートを初期状態に戻す
+    setEmptyContentError('');
+    setMuchContentError('');
+
     // 空文字の場合はエラーメッセージをセット
     if (!newMemo.trim()) {
-      setValidationError('メモの内容を入力してください。'); 
+      setEmptyContentError('メモの内容を入力してください。'); 
+      return;
+    }
+
+    // 字数制限超えのバリデーション
+    if (newMemo.length > 65 ) {
+      setMuchContentError('65文字以内で入力してください。');
       return;
     }
 
@@ -55,7 +70,7 @@ function MemoList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewMemo('');
-      setValidationError('');
+      setEmptyContentError('');
       setShowModal(false);
       await fetchMemos();
     } catch (error) {
@@ -66,8 +81,18 @@ function MemoList() {
 
   // メモを編集する関数
   const editMemo = async () => {
+    // アラートを初期状態に戻す
+    setEmptyContentError('');
+    setMuchContentError('');
+
+    // 空文字のバリデーション
     if (!newMemo.trim()) {
-      setValidationError('メモの内容を入力してください。'); // 空文字の場合はエラーメッセージをセット
+      setEmptyContentError('メモの内容を入力してください。');
+    }
+
+    // 字数超えのバリデーション
+    if (newMemo.length > 65 ) {
+      setMuchContentError('65文字以内で入力してください。');
       return;
     }
 
@@ -79,7 +104,7 @@ function MemoList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setNewMemo('');
-      setValidationError('');
+      setEmptyContentError('');
       setEditMemoId(null);
       setShowModal(false);
       await fetchMemos();
@@ -92,7 +117,7 @@ function MemoList() {
   const handleEdit = (memo) => {
     setEditMemoId(memo.id);
     setNewMemo(memo.content); 
-    setValidationError(''); 
+    setEmptyContentError(''); 
     setShowModal(true);
   };
 
@@ -111,7 +136,7 @@ function MemoList() {
 
   // モーダルを閉じる際にエラーメッセージをリセット
   const handleCloseModal = () => {
-    setValidationError('');
+    setEmptyContentError('');
     setShowModal(false);
   };
 
@@ -149,7 +174,8 @@ function MemoList() {
             placeholder="メモを入力してください"
             className="form-control mt-3"
           />
-          {validationError && <p style={{ color: 'red', marginTop: '10px' }}>{validationError}</p>} {/* エラーメッセージを表示 */}
+          {emptyContentError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{emptyContentError}</p>} {/* エラーメッセージを表示 */}
+          {muchContentError && <p style={{ color: 'red', fontSize: '0.8rem'}} className='mt-1'>{muchContentError}</p>} {/* エラーメッセージを表示 */}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>戻る</Button>

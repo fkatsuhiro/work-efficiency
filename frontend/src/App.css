@@ -12,7 +12,7 @@ ul{
 
 .background {
   background-color: whitesmoke;
-  height: 89vh;
+  height: 90vh;
 }
 
 .center {
@@ -108,6 +108,15 @@ ul{
   border-radius: 15px;
   border: gray 2px solid;
   height: 150px;
+  padding: 10px 20px;
+}
+
+.top-task-item {
+  width: 95%;
+  margin: 0 auto;
+  border-radius: 0;
+  border: gray 2px solid;
+  height: 140px;
   padding: 10px 20px;
 }
 

@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Route, Routes, Navigate, Link } from 'react-ro
 import Register from './components/Register';
 import Login from './components/Login';
 import MemoList from './components/MemoList';
-import Top from './components/Top';
 import DocumentList from './components/DocumentList';
 import TaskList from './components/TaskList';
 import CalenderPage from './components/CalenderPage';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import icon from './images/icon.jpg';
 import ToDoDisplay from './components/ToDoDisplay';
+import TopPage from './components/TopPage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -60,7 +60,7 @@ function App() {
                     <Link className="nav-link" to="/events">Calender</Link>
                   </li>*/}
                   <li className="nav-item">
-                    <button className="nav-link btn" onClick={handleLogout}>Logout</button>
+                    <Link className='nav-link' onClick={handleLogout}>Logout</Link>
                   </li>
                 </ul>
               </div>
@@ -74,7 +74,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path="/memos" element={isLoggedIn ? <MemoList /> : <Navigate to="/login" />} />
-        <Route path="/top" element={isLoggedIn ? <Top /> : <Navigate to="/login" />} />
+        <Route path="/top" element={isLoggedIn ? <TopPage /> : <Navigate to="/login" />} />
         <Route path="/documents" element={isLoggedIn ? <DocumentList /> : <Navigate to="/login" />} />
         <Route path="/tasks" element={isLoggedIn ? <TaskList /> : <Navigate to="/login" />} />
         <Route path="/events" element={isLoggedIn ? <CalenderPage /> : <Navigate to="/login" />} />

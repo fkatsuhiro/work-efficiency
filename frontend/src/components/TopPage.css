@@ -1,0 +1,46 @@
+/* 全体のレイアウト */
+.left-side {
+    width: 60%;
+    /*background-color: #f8f9fa;*/
+    /*padding: 15px;*/
+    /*border-radius: 8px;*/
+    height: 87vh;
+    padding-top: 3vh;
+    overflow-y: auto;
+}
+
+.right-side {
+    width: 40%;
+    height: 87vh;
+    padding-top: 4vh;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.today-todo-title {
+    width: 80%;
+    margin: 0 auto;
+}
+.top-todos {
+    height: 25vh;
+    width: 100%;
+    margin: 0 auto;
+    overflow-y: auto;
+}
+
+.inner-top-todos {
+    width: 70%;
+    margin: 0 auto;
+}
+
+.top-memos {
+    height: 40vh;
+    text-align: center;
+}
+
+.sticky-note {
+    position: relative;
+    height: 150px;
+    width: 150px;
+    margin: 0 auto;
+}
