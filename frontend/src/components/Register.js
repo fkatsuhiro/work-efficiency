@@ -18,9 +18,15 @@ function Register(){
   const [ validationNameError , setValidationNameError ] = useState('');
   const [ validationPasswordError, setValidationPasswordError ] = useState('');
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   const handleRegister = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/register', { username, password });
+      const response = await axios.post(`${apiUrl}/register`, { username, password });
       // 成功メッセージを表示
       alert(response.data);
       // 登録成功後に /memos に遷移

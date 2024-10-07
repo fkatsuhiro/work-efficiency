@@ -17,6 +17,11 @@ function Login({ setIsLoggedIn }) {
   const navigate = useNavigate();
   // 空文字チェック用のエラーメッセージ
   const [validationError, setValidationError] = useState('');
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +30,7 @@ function Login({ setIsLoggedIn }) {
     const trimmedUsername = username.trim();
 
     try {
-      const res = await axios.post('http://localhost:5000/login', { username: trimmedUsername, password });
+      const res = await axios.post(`${apiUrl}/login`, { username: trimmedUsername, password });
       localStorage.setItem('token', res.data.token); // トークンをローカルストレージに保存
       console.log('Login successful');
       setIsLoggedIn(true); // ログイン状態を更新

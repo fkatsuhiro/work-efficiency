@@ -19,6 +19,12 @@ function MemoList() {
   const [ muchContentError, setMuchContentError] = useState('');
   const navigate = useNavigate();
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   const fetchMemos = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -26,7 +32,7 @@ function MemoList() {
         throw new Error("Token not found");
       }
 
-      const response = await axios.get('http://localhost:5000/memos', {
+      const response = await axios.get(`${apiUrl}/memos`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -65,7 +71,7 @@ function MemoList() {
       const token = localStorage.getItem('token');
       const time = new Date().toISOString(); // 現在の時刻を取得
       await axios.post(
-        'http://localhost:5000/memos',
+        `${apiUrl}/memos`,
         { content: newMemo, createdAt: time },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -99,7 +105,7 @@ function MemoList() {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/memos/${editMemoId}`,
+        `${apiUrl}/memos/${editMemoId}`,
         { content: newMemo },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -124,7 +130,7 @@ function MemoList() {
   const handleDeleteMemo = async (memoId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/memos/${memoId}`, {
+      await axios.delete(`${apiUrl}/memos/${memoId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Memo deleted successfully');

@@ -13,11 +13,17 @@ function ToDoItem({ todo, fetchTodos }) {
     // バリデーションチェック用
     const [emptyContentError, setEmptyContentError] = useState('');
 
+    // 環境変数を参照
+    const apiUrl =
+        process.env.NODE_ENV === 'development'
+            ? process.env.REACT_APP_API_URL_DEV
+            : process.env.REACT_APP_API_URL_PROD;
+
     // ToDoの完了状態を切り替える関数
     const handleToggleComplete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/todos/${todo.id}`, {
+            await axios.put(`${apiUrl}/todos/${todo.id}`, {
                 content: todo.content,
                 completed: !isCompleted, // 反転させる
                 today_todo_status: todo.today_todo_status,
@@ -45,7 +51,7 @@ function ToDoItem({ todo, fetchTodos }) {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/todos/${todo.id}`, {
+            await axios.put(`${apiUrl}/todos/${todo.id}`, {
                 content: editedContent,
                 completed: isCompleted,
                 today_todo_status: todo.today_todo_status,
@@ -65,7 +71,7 @@ function ToDoItem({ todo, fetchTodos }) {
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('token');
-            await axios.delete(`http://localhost:5000/todos/${todo.id}`, {
+            await axios.delete(`${apiUrl}/todos/${todo.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchTodos(); // ToDo一覧を再取得

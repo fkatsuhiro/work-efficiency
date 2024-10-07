@@ -14,11 +14,17 @@ function ToDoDisplay() {
     // バリデーションチェック用
     const [emptyContentError, setEmptyContentError] = useState('');
 
+    // 環境変数を参照
+    const apiUrl =
+        process.env.NODE_ENV === 'development'
+            ? process.env.REACT_APP_API_URL_DEV
+            : process.env.REACT_APP_API_URL_PROD;
+
     // ToDo一覧を取得する関数
     const fetchTodos = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/todos', {
+            const res = await axios.get(`${apiUrl}/todos`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setTodos(res.data);
@@ -53,7 +59,7 @@ function ToDoDisplay() {
                 everyday_todo_status: newTodoStatus === 'everyday' ? 1 : 0,
                 completed: 0 // 新しいToDoは未完了
             };
-            await axios.post('http://localhost:5000/todos', newTodo, {
+            await axios.post(`${apiUrl}/todos`, newTodo, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setNewTodoContent(''); // フォームをクリア

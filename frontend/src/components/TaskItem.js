@@ -43,6 +43,12 @@ function TaskItem({ task, minDeadline, onDelete, onUpdate, fetchTasks }) {
   const [ choiceStatusError, setChoiceStatusError ] = useState('');
   const [ emptyDeadlineError, setEmptyDeadlineError ] = useState('');
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   // タスクを更新する関数
   const handleUpdate = async () => {
     setEmptyContentError('');
@@ -89,7 +95,7 @@ function TaskItem({ task, minDeadline, onDelete, onUpdate, fetchTasks }) {
       }
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/tasks/${task.id}`,
+        `${apiUrl}/tasks/${task.id}`,
         {
           content: editedContent,
           status: editedStatus,
@@ -113,7 +119,7 @@ function TaskItem({ task, minDeadline, onDelete, onUpdate, fetchTasks }) {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5000/tasks/${task.id}`, {
+      await axios.delete(`${apiUrl}/tasks/${task.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onDelete(task.id);

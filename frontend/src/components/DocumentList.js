@@ -15,13 +15,19 @@ function DocumentList() {
   // ドキュメント名が空の場合
   const [emptyDocumentNameError, setEmptyDocumentNameError] = useState('');
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   useEffect(() => {
     fetchDocuments();
   }, []);
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/documents', {
+      const response = await axios.get(`${apiUrl}/documents`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       setDocuments(response.data);
@@ -65,7 +71,7 @@ function DocumentList() {
     }
 
     try {
-      await axios.post('http://localhost:5000/documents', {
+      await axios.post(`${apiUrl}/documents`, {
         content: markdown,
         name: documentName
       }, {
@@ -82,7 +88,7 @@ function DocumentList() {
 
   const loadDocument = async (id) => {
     const token = localStorage.getItem('token');
-    const response = await axios.get(`http://localhost:5000/documents/${id}`, {
+    const response = await axios.get(`${apiUrl}/documents/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     setMarkdown(response.data.content);

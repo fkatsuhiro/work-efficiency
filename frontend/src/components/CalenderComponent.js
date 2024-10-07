@@ -8,10 +8,16 @@ const daysOfWeek = ['(日)', '(月)', '(火)', '(水)', '(木)', '(金)', '(土)
 function CalenderComponent({ events, setEvents }) {
     const [currentDate, setCurrentDate] = useState(new Date());
 
+    // 環境変数を参照
+    const apiUrl =
+        process.env.NODE_ENV === 'development'
+            ? process.env.REACT_APP_API_URL_DEV
+            : process.env.REACT_APP_API_URL_PROD;
+
     const fetchEvents = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:5000/events', {
+            const response = await axios.get(`${apiUrl}/events`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setEvents(response.data);
@@ -83,18 +89,18 @@ function CalenderComponent({ events, setEvents }) {
         const startTime = new Date(start);
         const endTime = new Date(end);
         const durationInMinutes = (endTime - startTime) / (1000 * 60);
-    
+
         // 各時間帯を60pxの高さと仮定します
         const height = (durationInMinutes / 60) * 60;
-    
+
         // カレンダーが午前0時（00:00）から始まり、各時間帯が60pxの高さで表示されると仮定します
         const topPosition = (startTime.getHours() * 60) + (startTime.getMinutes());
 
         const celwidth = window.innerWidth;
-    
+
         return { topPosition, height, celwidth };  // 'topPosition' と 'height' を返す
     };
-    
+
     return (
         <div style={{ width: '100%' }}>
             {/* カレンダー上部の表 */}
@@ -113,23 +119,23 @@ function CalenderComponent({ events, setEvents }) {
                     </div>
                 ))}
             </div>
-    
+
             {/* タイムライン */}
             <div className="calendar-body">
                 {HOURS.map((hour, hourIndex) => (
                     <div key={hourIndex} className="calendar-row">
                         {/* 時間ラベル */}
                         <div className="calendar-hour">{hour}</div>
-    
+
                         {/* 各日の時間枠 */}
                         {weekDates.map((date, dayIndex) => {
                             const event = getEventForSlot(date, hourIndex);
-    
+
                             // イベントが存在する場合のみ位置を計算
                             if (event) {
                                 // ここで calculateEventPosition を呼び出して 'topPosition' と 'height' を取得
                                 const { topPosition, height, celwidth } = calculateEventPosition(event.start_time, event.end_time);
-    
+
                                 return (
                                     <div key={dayIndex} className="calendar-slot">
                                         <div className="calendar-event">
@@ -157,8 +163,8 @@ function CalenderComponent({ events, setEvents }) {
             </div>
         </div>
     );
-    
-    
+
+
 };
 
 export default CalenderComponent;

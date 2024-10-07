@@ -9,6 +9,12 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
   // バリデーションチェック用
   const [emptyContentError, setEmptyContentError] = useState('');
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   const handleUpdate = async () => {
 
     if (!editedContent.trim()) {
@@ -19,7 +25,7 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `http://localhost:5000/memos/${memo.id}`,
+        `${apiUrl}/memos/${memo.id}`,
         { content: editedContent },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -34,7 +40,7 @@ function MemoItem({ memo, onUpdate, onDelete, fetchMemos }) {
   const handleDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete(`http://localhost:5000/memos/${memo.id}`, {
+      const response = await axios.delete(`${apiUrl}/memos/${memo.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response.data);

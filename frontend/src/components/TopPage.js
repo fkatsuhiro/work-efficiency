@@ -14,6 +14,12 @@ function TopPage() {
   const [memos, setMemos] = useState([]);
   const [currentMemoIndex, setCurrentMemoIndex] = useState(0);
 
+  // 環境変数を参照
+  const apiUrl =
+  process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   useEffect(() => {
     fetchTasks();
     fetchTodos();
@@ -23,7 +29,7 @@ function TopPage() {
   // 締め切りが近いタスクを取得
   const fetchTasks = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/tasks', {
+      const res = await axios.get(`${apiUrl}/tasks`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       const sortedTasks = res.data
@@ -40,7 +46,7 @@ function TopPage() {
   // 本日のToDoと毎日のToDoを取得する関数
   const fetchTodos = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/todos', {
+      const res = await axios.get(`${apiUrl}/todos`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       // 今日のToDo（today_todo_statusが1）と毎日のToDo（everyday_todo_statusが1）を取得
@@ -71,7 +77,7 @@ function TopPage() {
   // メモを取得
   const fetchMemos = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/memos', {
+      const res = await axios.get(`${apiUrl}/memos`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setMemos(res.data);

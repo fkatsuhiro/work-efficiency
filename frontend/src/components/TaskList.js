@@ -14,6 +14,12 @@ function TaskList() {
   const [muchContentError, setMuchContentError] = useState('');
   const [minDeadline, setMinDeadline] = useState('');
 
+  // 環境変数を参照
+  const apiUrl =
+    process.env.NODE_ENV === 'development'
+      ? process.env.REACT_APP_API_URL_DEV
+      : process.env.REACT_APP_API_URL_PROD;
+
   useEffect(() => {
     fetchTasks();
     // ページロード時に最小日付を設定
@@ -22,7 +28,7 @@ function TaskList() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/tasks', {
+      const res = await axios.get(`${apiUrl}/tasks`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       });
       // 完了度100%のタスクを最後尾にし、それ以外は締め切り順にソート
@@ -125,7 +131,7 @@ function TaskList() {
     }
 
     try {
-      await axios.post('http://localhost:5000/tasks', {
+      await axios.post(`${apiUrl}/tasks`, {
         content: newTaskContent,
         status: newTaskStatus,
         deadline: newTaskDeadline
