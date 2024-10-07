@@ -29,8 +29,9 @@ function Register(){
       const response = await axios.post(`${apiUrl}/register`, { username, password });
       // 成功メッセージを表示
       alert(response.data);
-      // 登録成功後に /memos に遷移
+      // 登録成功後に /top に遷移
       navigate('/top');
+      console.log('登録に成功しました');
     } catch (error) {
       // エラーメッセージを表示
       setError(error.response.data);
@@ -66,7 +67,7 @@ function Register(){
 
   return (
     <div className="container mt-5">
-    <form onSubmit={handleRegister} className='login-form'>
+    <div className='login-form'>
       <h4 className='login-title'>新規登録</h4>
       <div className="mb-3 inner-login-form">
         <input
@@ -100,12 +101,12 @@ function Register(){
         {validationPasswordError && <p style={{ color: 'red', fontSize: '0.8rem' }} className='mt-1'>{validationPasswordError}</p>} {/* エラーメッセージを表示 */}
       </div>
       <div className='mb-3 button-right-position inner-login-form'>
-        <button type="submit" className="btn btn-primary">Register</button>
+        <button onClick={handleRegister} className="btn btn-primary">Register</button>
       </div>
       <div className='button-right-position inner-login-form'>
         すでに登録済みの方は<Link to="/login">こちら</Link>
       </div>
-    </form>
+    </div>
   </div>
   );
 }
