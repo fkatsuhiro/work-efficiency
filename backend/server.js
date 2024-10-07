@@ -9,7 +9,7 @@ const tomorrow = new Date(new Date().setDate(new Date().getDate() + 1)).toISOStr
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3000', // ReactアプリケーションのURL
+    origin: ['http://localhost:3000', 'https://work-efficiency.onrender.com'], // ReactアプリケーションのURL
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // 許可するHTTPメソッド
     credentials: true // クッキーや認証情報を許可する場合はtrueに設定
 }));
